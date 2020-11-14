@@ -6,16 +6,26 @@
 //
 
 import UIKit
+import BackgroundTasks
+import Foundation
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    
+    let taskIdentifier = "com.danalboteanu.apprefresh.CovidState"
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        
+        PersistentContainer.shared.loadInitialData()
+        
+        // MARK: Registering Launch Handlers for Tasks
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in
+            // Downcast the parameter to an app refresh task as this identifier is used for a refresh request.
+            self.handleAppRefresh(task: task as! BGAppRefreshTask)
+        }
+        
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 
@@ -42,14 +52,47 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-
         // Save changes in the application's managed object context when the application transitions to the background.
-        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+//        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+        scheduleAppRefresh()
+    }
+    
+    // MARK: - Scheduling Tasks
+    
+    func scheduleAppRefresh() {
+        let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 10 * 60) // Fetch no earlier than 10 minutes from now
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            print("Could not schedule app refresh: \(error)")
+        }
     }
 
+    // MARK: - Handling Launch for Tasks
+    
+    func handleAppRefresh(task: BGAppRefreshTask) {
+        scheduleAppRefresh()
+        
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        
+        let context = PersistentContainer.shared.newBackgroundContext()
+        let operations = Operations.getOperationsToFetchCovidData(using: context)
+        let lastOperation = operations.last!
+        
+        task.expirationHandler = {
+            // After all operations are cancelled, the completion block below is called to set the task to complete.
+            queue.cancelAllOperations()
+        }
+
+        lastOperation.completionBlock = {
+            task.setTaskCompleted(success: !lastOperation.isCancelled)
+        }
+
+        queue.addOperations(operations, waitUntilFinished: false)
+    }
 
 }
 

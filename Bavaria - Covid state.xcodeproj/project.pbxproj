@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A46D758525605EE80093D618 /* FeedEntry.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A46D758325605EE80093D618 /* FeedEntry.xcdatamodeld */; };
+		A48656FC25600ED200990BCA /* PersistentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48656FB25600ED200990BCA /* PersistentContainer.swift */; };
+		A48657042560125100990BCA /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48657032560125100990BCA /* Operations.swift */; };
 		A4974F2B25574B0400F27484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4974F2A25574B0400F27484 /* AppDelegate.swift */; };
 		A4974F2D25574B0400F27484 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4974F2C25574B0400F27484 /* SceneDelegate.swift */; };
 		A4974F2F25574B0400F27484 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4974F2E25574B0400F27484 /* ViewController.swift */; };
 		A4974F3225574B0400F27484 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4974F3025574B0400F27484 /* Main.storyboard */; };
-		A4974F3525574B0400F27484 /* Bavaria___Covid_state.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A4974F3325574B0400F27484 /* Bavaria___Covid_state.xcdatamodeld */; };
 		A4974F3725574B0600F27484 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4974F3625574B0600F27484 /* Assets.xcassets */; };
 		A4974F3A25574B0600F27484 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4974F3825574B0600F27484 /* LaunchScreen.storyboard */; };
 		A4974F4525574B0600F27484 /* Bavaria___Covid_stateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4974F4425574B0600F27484 /* Bavaria___Covid_stateTests.swift */; };
@@ -36,12 +38,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A46D758425605EE80093D618 /* FeedEntry.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FeedEntry.xcdatamodel; sourceTree = "<group>"; };
+		A48656FB25600ED200990BCA /* PersistentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainer.swift; sourceTree = "<group>"; };
+		A48657032560125100990BCA /* Operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operations.swift; sourceTree = "<group>"; };
 		A4974F2725574B0400F27484 /* Bavaria - Covid state.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bavaria - Covid state.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4974F2A25574B0400F27484 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4974F2C25574B0400F27484 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A4974F2E25574B0400F27484 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A4974F3125574B0400F27484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		A4974F3425574B0400F27484 /* Bavaria___Covid_state.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bavaria___Covid_state.xcdatamodel"; sourceTree = "<group>"; };
 		A4974F3625574B0600F27484 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4974F3925574B0600F27484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A4974F3B25574B0600F27484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -78,6 +82,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A48656F925600E6500990BCA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				A48656FB25600ED200990BCA /* PersistentContainer.swift */,
+				A48657032560125100990BCA /* Operations.swift */,
+				A46D758325605EE80093D618 /* FeedEntry.xcdatamodeld */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		A48656FA25600E7D00990BCA /* UI */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
 		A4974F1E25574B0400F27484 = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +122,8 @@
 		A4974F2925574B0400F27484 /* Bavaria - Covid state */ = {
 			isa = PBXGroup;
 			children = (
+				A48656FA25600E7D00990BCA /* UI */,
+				A48656F925600E6500990BCA /* Model */,
 				A4974F2A25574B0400F27484 /* AppDelegate.swift */,
 				A4974F2C25574B0400F27484 /* SceneDelegate.swift */,
 				A4974F2E25574B0400F27484 /* ViewController.swift */,
@@ -108,7 +131,6 @@
 				A4974F3625574B0600F27484 /* Assets.xcassets */,
 				A4974F3825574B0600F27484 /* LaunchScreen.storyboard */,
 				A4974F3B25574B0600F27484 /* Info.plist */,
-				A4974F3325574B0400F27484 /* Bavaria___Covid_state.xcdatamodeld */,
 			);
 			path = "Bavaria - Covid state";
 			sourceTree = "<group>";
@@ -261,9 +283,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A46D758525605EE80093D618 /* FeedEntry.xcdatamodeld in Sources */,
 				A4974F2F25574B0400F27484 /* ViewController.swift in Sources */,
 				A4974F2B25574B0400F27484 /* AppDelegate.swift in Sources */,
-				A4974F3525574B0400F27484 /* Bavaria___Covid_state.xcdatamodeld in Sources */,
+				A48656FC25600ED200990BCA /* PersistentContainer.swift in Sources */,
+				A48657042560125100990BCA /* Operations.swift in Sources */,
 				A4974F2D25574B0400F27484 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -599,13 +623,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		A4974F3325574B0400F27484 /* Bavaria___Covid_state.xcdatamodeld */ = {
+		A46D758325605EE80093D618 /* FeedEntry.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				A4974F3425574B0400F27484 /* Bavaria___Covid_state.xcdatamodel */,
+				A46D758425605EE80093D618 /* FeedEntry.xcdatamodel */,
 			);
-			currentVersion = A4974F3425574B0400F27484 /* Bavaria___Covid_state.xcdatamodel */;
-			path = "Bavaria___Covid_state.xcdatamodeld";
+			currentVersion = A46D758425605EE80093D618 /* FeedEntry.xcdatamodel */;
+			path = FeedEntry.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
