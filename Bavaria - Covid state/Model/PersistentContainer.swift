@@ -5,8 +5,8 @@
 //  Created by Dan Alboteanu on 14.11.2020.
 //
 
-import Foundation
 import CoreData
+
 
 class PersistentContainer : NSPersistentContainer {
     
@@ -35,4 +35,6 @@ class PersistentContainer : NSPersistentContainer {
     
     
 }
+
+
 
