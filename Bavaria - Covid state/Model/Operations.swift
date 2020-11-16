@@ -5,50 +5,29 @@
 //  Created by Dan Alboteanu on 14.11.2020.
 //
 
-import UIKit
-import CoreData
 import Firebase
+import CoreData
 
 struct Operations {
 
     static func getOperationsToFetchCovidData(using context: NSManagedObjectContext) -> [Operation] {
         let fetchMostRecentLocationOperation = FetchMostRecentLocationOperation(context: context)
-        let triggerCloudFunctionToCheckCovidStateOperation = TriggerCloudFunctionToCheckCovidStateOperation(context: context)
+        let triggerCloudFunctionOperation = TriggerCloudFunctionOperation(context: context)
         
-        let passLastLocationToServer = BlockOperation { [unowned fetchMostRecentLocationOperation, unowned triggerCloudFunctionToCheckCovidStateOperation] in
-            guard let lat = fetchMostRecentLocationOperation.result?.lat else {
-                triggerCloudFunctionToCheckCovidStateOperation.cancel()
+        let sendLocationToCloudFunction = BlockOperation { [unowned fetchMostRecentLocationOperation, unowned triggerCloudFunctionOperation] in
+            guard (fetchMostRecentLocationOperation.result) != nil else {
+                triggerCloudFunctionOperation.cancel()
                 return
             }
-            triggerCloudFunctionToCheckCovidStateOperation.lon = fetchMostRecentLocationOperation.result?.lon
-            triggerCloudFunctionToCheckCovidStateOperation.lat = lat
-            triggerCloudFunctionToCheckCovidStateOperation.language = NSLocale.current.languageCode
+            triggerCloudFunctionOperation.currentLocation = fetchMostRecentLocationOperation.result
         }
         
+        sendLocationToCloudFunction.addDependency(fetchMostRecentLocationOperation)
+        triggerCloudFunctionOperation.addDependency(sendLocationToCloudFunction)
         
-//        let fetchMostRecentEntry = FetchMostRecentEntryOperation(context: context)
-//        let downloadFromServer = DownloadEntriesFromServerOperation(context: context,
-//                                                                             server: server)
-//        let passTimestampToServer = BlockOperation { [unowned fetchMostRecentEntry, unowned downloadFromServer] in
-//            guard let timestamp = fetchMostRecentEntry.result?.timestamp else {
-//                downloadFromServer.cancel()
-//                return
-//            }
-//            downloadFromServer.sinceDate = timestamp
-//        }
-//        passTimestampToServer.addDependency(fetchMostRecentEntry)
-//        downloadFromServer.addDependency(passTimestampToServer)
-        
-        passLastLocationToServer.addDependency(fetchMostRecentLocationOperation)
-        triggerCloudFunctionToCheckCovidStateOperation.addDependency(passLastLocationToServer)
-      
-        
-        return [fetchMostRecentLocationOperation,
-                passLastLocationToServer,
-        triggerCloudFunctionToCheckCovidStateOperation]
-    }    
-
-}
+        return [fetchMostRecentLocationOperation, sendLocationToCloudFunction, triggerCloudFunctionOperation]
+        }
+    }
 
 // Fetches the most recent location entry from the Core Data store.
 class FetchMostRecentLocationOperation: Operation {
@@ -69,7 +48,6 @@ class FetchMostRecentLocationOperation: Operation {
             do {
                 let fetchResult = try context.fetch(request)
                 guard !fetchResult.isEmpty else { return }
-                let lat = fetchResult[0].lat
                 
                 result = fetchResult[0]
             } catch {
@@ -79,19 +57,16 @@ class FetchMostRecentLocationOperation: Operation {
     }
 }
 
-class TriggerCloudFunctionToCheckCovidStateOperation : Operation {
+class TriggerCloudFunctionOperation : Operation {
     private let context: NSManagedObjectContext
-    lazy var functions = Functions.functions()
+    var functions = Functions.functions()
+    
     enum OperationError: Error {
         case cancelled
     }
-    var timestamp:Date?
-    var lat: Double?
-    var lon: Double?
-    var language: String?
     
+    var currentLocation : LocationEntry?
     var result: Result<[HTTPSCallableResult?], Error>?
-    
     private var downloading = false
     private var currentDownloadTask: DownloadTask?
     
@@ -99,11 +74,9 @@ class TriggerCloudFunctionToCheckCovidStateOperation : Operation {
         self.context = context
     }
     
-    convenience init(context: NSManagedObjectContext, lat: Double, lon: Double, language: String) {
+    convenience init(context: NSManagedObjectContext, location : LocationEntry?) {
         self.init(context: context)
-        self.lat = lat
-        self.lon = lon
-        self.language = language
+        self.currentLocation = location
     }
     
     override var isAsynchronous: Bool {
@@ -144,32 +117,35 @@ class TriggerCloudFunctionToCheckCovidStateOperation : Operation {
         downloading = true
         didChangeValue(forKey: #keyPath(isExecuting))
         
-        guard !isCancelled, let lat = lat else {
+        guard !isCancelled, let location = currentLocation else {
             finish(result: .failure(OperationError.cancelled))
             return
         }
         
-       // currentDownloadTask =
-//            server.fetchEntries(since: sinceDate, completion: finish)
-        functions.httpsCallable("addMessage2").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
+        let lat = currentLocation?.lat
+        let lon = currentLocation?.lon
+        let language = NSLocale.current.languageCode
+        
+        functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
           if let error = error as NSError? {
             if error.domain == FunctionsErrorDomain {
               let code = FunctionsErrorCode(rawValue: error.code)
               let message = error.localizedDescription
               let details = error.userInfo[FunctionsErrorDetailsKey]
             }
-            // ...
+           
+            self.finish(result: .failure(error))
           }
-          if let text = (result?.data as? [String: Any])?["text"] as? String {
-//            self.resultField.text = text
-            print(text)
+        let resultTXT = (result?.data as? [String: Any])
+          if let resultText = (result?.data as? [String: Any])?["text"] as? String {
+            print(resultText)
+            self.finish(result: .success([result]))
           }
         }
     }
-    
 }
 
-class LocationEntryToStoreOperation: Operation {
+class AddLocationEntryToStoreOperation: Operation {
     private let context: NSManagedObjectContext
     var locationEntry: LocationEntry?
 
@@ -183,15 +159,12 @@ class LocationEntryToStoreOperation: Operation {
     }
     
     override func main() {
-        guard let entry = locationEntry else { return }
+        guard let locationEntry = locationEntry else { return }
 
         context.performAndWait {
             do {
-               
-                _ = LocationEntry(context: context, lat: entry.lat, lon: entry.lon, timestamp: entry.timestamp!)
-                    
-                    print("Adding entry with timestamp: \(entry.timestamp)")
-                    
+                _ = LocationEntry(context: context, lat: locationEntry.lat, lon: locationEntry.lon, timestamp: locationEntry.timestamp!)
+                    print("Adding entry with timestamp: \(locationEntry.timestamp)")
                     try context.save()
                 
             } catch {
@@ -202,35 +175,30 @@ class LocationEntryToStoreOperation: Operation {
 }
 
 // Add entries returned from the server to the Core Data store.
-class AddEntriesToStoreOperation: Operation {
+class AddAreaInfoEntryToStoreOperation: Operation {
     private let context: NSManagedObjectContext
-    var entries: [AreaInfoEntry]?
+    var areaInfo: AreaInfo?
 
     init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    convenience init(context: NSManagedObjectContext, entries: [AreaInfoEntry]) {
+    convenience init(context: NSManagedObjectContext, areaInfo: AreaInfo) {
         self.init(context: context)
-        self.entries = entries
+        self.areaInfo = areaInfo
     }
     
     override func main() {
-        guard let entries = entries else { return }
+        guard let areaInfo = areaInfo else { return }
 
         context.performAndWait {
             do {
-                for entry in entries {
-                    _ = AreaInfo(context: context, areaInfoEntry: entry)
+                    _ = AreaInfoEntry(context: context, areaInfo: areaInfo)
                     
-                    print("Adding entry with timestamp: \(entry.timestamp)")
+                    print("Adding entry with timestamp: \(areaInfo.timestamp)")
                     
                     try context.save()
 
-                    if isCancelled {
-                        break
-                    }
-                }
             } catch {
                 print("Error adding entries to store: \(error)")
             }
@@ -239,20 +207,19 @@ class AddEntriesToStoreOperation: Operation {
 }
 
 // A struct representing the response from the server for a single feed entry.
-struct AreaInfoEntry: Codable {
-
+struct AreaInfo: Codable {
     let timestamp: Date
     let dangerlevel: Int16
     let message: String
 }
 
-// An extension to create a FeedEntry object from the server representation of an entry.
-extension AreaInfo {
-    convenience init(context: NSManagedObjectContext, areaInfoEntry: AreaInfoEntry) {
+// An extension to create a AreaInfoEntry object from the server representation of an entry.
+extension AreaInfoEntry {
+    convenience init(context: NSManagedObjectContext, areaInfo: AreaInfo) {
         self.init(context: context)
-        self.message = areaInfoEntry.message
-        self.dangerlevel = areaInfoEntry.dangerlevel
-        self.timestamp = areaInfoEntry.timestamp
+        self.message = areaInfo.message
+        self.dangerlevel = areaInfo.dangerlevel
+        self.timestamp = areaInfo.timestamp
     }
 }
 
@@ -262,90 +229,7 @@ extension LocationEntry {
         self.lat = lat
         self.lon = lon
         self.timestamp = timestamp
-    }
-}
-
-extension AppDelegate : CLLocationManagerDelegate {
-    
-    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
-    // only first time, if position is not present in DB
-        initLocationManager()
-        getLocation()
-    
-    // The system wakes up the app to handle location updates.
-    // Reconfigure it to get location updates
-        if (launchOptions?[.location]) != nil  {
-        initLocationManager()
-        getLocation()
-        }
-    
-        return true
-    }
-    
-    func initLocationManager()  {
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.allowsBackgroundLocationUpdates = true
-    }
-    
-    func startMySignificantLocationChanges() {
-        if !CLLocationManager.significantLocationChangeMonitoringAvailable() {
-            // The device does not support this service.
-            return
-        }
-        locationManager.startMonitoringSignificantLocationChanges()
-    }
-    
-    // MARK: CLLocationManager functions
-
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        getLocation()
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if CLLocationManager.authorizationStatus() == .authorizedAlways ||
-            CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
-            
-            let lastLocation = locations.last!
-           print( "app delegate - lat: " , lastLocation.coordinate.latitude, Date())
-            let context = PersistentContainer.shared.newBackgroundContext()
-            
-            let entry = LocationEntry(context: context, lat: lastLocation.coordinate.latitude, lon: lastLocation.coordinate.longitude, timestamp: Date())
-            let operation = LocationEntryToStoreOperation(context: context, locationEntry: entry)
-            let queue = OperationQueue()
-            queue.maxConcurrentOperationCount = 1
-            queue.addOperation(operation)
-        } else {
-            // Do nothing
-            print("Cannot create a geofence because the user has not granted access to Location Services.")
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Error occured: \(error.localizedDescription).")
-    }
-    
-    func getLocation() {
-        switch CLLocationManager.authorizationStatus() {
-        case .notDetermined:
-           locationManager.requestAlwaysAuthorization()
-            break
-        case .authorizedWhenInUse:
-            startMySignificantLocationChanges()
-            break
-        case .authorizedAlways:
-            startMySignificantLocationChanges()
-            break
-        case .restricted:
-            // Restricted by e.g. parental controls. User can't enable Location Services
-            print("location unauthorised - restricted")
-            break
-        case .denied:
-            // User denied access to Location Services, but can grant access later from the Settings app
-            print("location unauthorised - denied")
-            break
-        }
+        self.id = 0   // replace previous entry location
     }
 }
 

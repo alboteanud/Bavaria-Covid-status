@@ -14,6 +14,7 @@
 		A46EE3482561385700802CF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A46EE3472561385700802CF3 /* GoogleService-Info.plist */; };
 		A46EE34E2561672D00802CF3 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46EE34D2561672D00802CF3 /* Mocks.swift */; };
 		A46EE36225619F4200802CF3 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46EE36125619F4200802CF3 /* Server.swift */; };
+		A46EE36A2561BB5B00802CF3 /* GeoLocationOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46EE3692561BB5B00802CF3 /* GeoLocationOperations.swift */; };
 		A48656FC25600ED200990BCA /* PersistentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48656FB25600ED200990BCA /* PersistentContainer.swift */; };
 		A48657042560125100990BCA /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48657032560125100990BCA /* Operations.swift */; };
 		A4974F2B25574B0400F27484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4974F2A25574B0400F27484 /* AppDelegate.swift */; };
@@ -52,6 +53,7 @@
 		A46EE3472561385700802CF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A46EE34D2561672D00802CF3 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
 		A46EE36125619F4200802CF3 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
+		A46EE3692561BB5B00802CF3 /* GeoLocationOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLocationOperations.swift; sourceTree = "<group>"; };
 		A48656FB25600ED200990BCA /* PersistentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainer.swift; sourceTree = "<group>"; };
 		A48657032560125100990BCA /* Operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operations.swift; sourceTree = "<group>"; };
 		A4974F2725574B0400F27484 /* Bavaria - Covid state.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bavaria - Covid state.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,6 +127,7 @@
 				A48656FB25600ED200990BCA /* PersistentContainer.swift */,
 				A48657032560125100990BCA /* Operations.swift */,
 				A46D758325605EE80093D618 /* FeedEntry.xcdatamodeld */,
+				A46EE3692561BB5B00802CF3 /* GeoLocationOperations.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 				A4974F2B25574B0400F27484 /* AppDelegate.swift in Sources */,
 				A48656FC25600ED200990BCA /* PersistentContainer.swift in Sources */,
 				A48657042560125100990BCA /* Operations.swift in Sources */,
+				A46EE36A2561BB5B00802CF3 /* GeoLocationOperations.swift in Sources */,
 				A46EE34E2561672D00802CF3 /* Mocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

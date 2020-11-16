@@ -12,8 +12,6 @@ struct Mocks {
     
 }
 
-
-
 extension NSPersistentContainer {
    
     // Fills the Core Data store with initial fake data
@@ -22,7 +20,7 @@ extension NSPersistentContainer {
         let context = newBackgroundContext()
         context.perform {
             do {
-                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = AreaInfo.fetchRequest()
+                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = AreaInfoEntry.fetchRequest()
                 if !onlyIfNeeded {
                     // Delete all data currently in the store
                     let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: allEntriesRequest)
@@ -45,11 +43,10 @@ extension NSPersistentContainer {
         }
     }
     
-    private func generateFakeEntries(from date: Date, context: NSManagedObjectContext) -> [AreaInfo] {
-        var entries = [AreaInfo]()
-        let info = AreaInfo.init(entity:  NSEntityDescription.entity(forEntityName: "text", in: context)!, insertInto: context)
+    private func generateFakeEntries(from date: Date, context: NSManagedObjectContext) -> [AreaInfoEntry] {
+        var entries = [AreaInfoEntry]()
+        let info = AreaInfoEntry.init(entity:  NSEntityDescription.entity(forEntityName: "text", in: context)!, insertInto: context)
       
-        let message = "Phase GREEN. The traffic signal is set to GREEN when and if the incidence is below 35 cases per 100.000 residents. These rules apply: Limitations of face-to-face contact in public spaces. Private events ( i.e. weddings etc. ) with a maximum of 100 participants in closed spaces and a maximum of 200 participants in the open. Wearing a mask is mandatory when ( including, but not limited to ) using public transportation, going shopping, eating and drinking in restaurants, bars, etc. and in case minimum distance (1.5m ) cannot be kept"
         entries.append(info)
       
         return entries
