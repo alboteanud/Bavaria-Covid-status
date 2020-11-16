@@ -15,7 +15,7 @@ class ViewController: UIViewController{
     }
     
     @IBAction func onClick(_ sender: Any) {
-
+        NotificationManager().registerForNotifications(statusCode: "fake")
 
     }
    

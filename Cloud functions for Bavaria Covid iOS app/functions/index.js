@@ -15,7 +15,7 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
   const response = await doRequest(data.lat, data.lon)
 
   if (!response.features || !response.features.length > 0){
-    return { text: "back response: no Covid data in the area"  }
+    return { text: "back response: no data found"  }
   }
 
     const cases7_per_100k = response.features[0].attributes.cases7_per_100k
@@ -31,14 +31,17 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
     if (!documentFromDB.exists) {
         console.log('No such document!');
         return {
-          text: "back response. Not found." 
+          text: "back response. Instruction message not found." 
         }
       } 
         console.log(documentFromDB.data());
-
-  return {
-    text: "back response. Covid status: " + documentFromDB.data().message
+  const resultData = {
+    // // returning result to the client.
+    message: documentFromDB.data().message, statusCode: covidStatus.code, color: covidStatus.color, cases: cases7_per_100k.toString()
   }
+
+  console.log(resultData)
+  return resultData;
 
 
 });
@@ -68,7 +71,8 @@ function calculateCovidStatus(cases) {
 }
 
 async function doRequest(lat, lon) {
-  const url = baseUrl + '&geometry=' + '12' + '%2C' + '52';
+  const url = baseUrl 
+  + '&geometry=' + '12' + '%2C' + '52';
 
   let promise = new Promise((resolve, reject) => {
 

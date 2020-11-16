@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17511" systemVersion="20B29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AreaInfoEntry" representedClassName="AreaInfoEntry" syncable="YES" codeGenerationType="class">
-        <attribute name="dangerlevel" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="cases" optional="YES" attributeType="String"/>
         <attribute name="message" optional="YES" attributeType="String"/>
+        <attribute name="statusCode" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <userInfo>
+            <entry key="key" value="timestamp"/>
+        </userInfo>
     </entity>
     <entity name="LocationEntry" representedClassName="LocationEntry" syncable="YES" codeGenerationType="class">
         <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -15,7 +19,7 @@
         </userInfo>
     </entity>
     <elements>
-        <element name="AreaInfoEntry" positionX="-63" positionY="-18" width="128" height="74"/>
+        <element name="AreaInfoEntry" positionX="-63" positionY="-18" width="128" height="89"/>
         <element name="LocationEntry" positionX="-63" positionY="9" width="128" height="89"/>
     </elements>
 </model>

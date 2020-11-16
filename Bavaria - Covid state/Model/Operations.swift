@@ -7,33 +7,85 @@
 
 import Firebase
 import CoreData
+import UserNotifications
 
 struct Operations {
 
     static func getOperationsToFetchCovidData(using context: NSManagedObjectContext) -> [Operation] {
-        let fetchMostRecentLocationOperation = FetchMostRecentLocationOperation(context: context)
-        let triggerCloudFunctionOperation = TriggerCloudFunctionOperation(context: context)
+        let fetchLocationOperation = FetchLocationOperation(context: context)
+        let downloadFromCloudOperation = DownloadFromCloudOperation(context: context)
         
-        let sendLocationToCloudFunction = BlockOperation { [unowned fetchMostRecentLocationOperation, unowned triggerCloudFunctionOperation] in
-            guard (fetchMostRecentLocationOperation.result) != nil else {
-                triggerCloudFunctionOperation.cancel()
+        let sendLocationToCloud = BlockOperation { [unowned fetchLocationOperation, unowned downloadFromCloudOperation] in
+            guard (fetchLocationOperation.resultLocationEntry) != nil else {
+                downloadFromCloudOperation.cancel()
                 return
             }
-            triggerCloudFunctionOperation.currentLocation = fetchMostRecentLocationOperation.result
+            downloadFromCloudOperation.currentLocation = fetchLocationOperation.resultLocationEntry
         }
         
-        sendLocationToCloudFunction.addDependency(fetchMostRecentLocationOperation)
-        triggerCloudFunctionOperation.addDependency(sendLocationToCloudFunction)
+        sendLocationToCloud.addDependency(fetchLocationOperation)
+        downloadFromCloudOperation.addDependency(sendLocationToCloud)
         
-        return [fetchMostRecentLocationOperation, sendLocationToCloudFunction, triggerCloudFunctionOperation]
+        let addToStoreOperation = AddAreaInfoToStoreOperation(context: context)
+        let passCloudResultsToStore = BlockOperation { [unowned downloadFromCloudOperation, unowned addToStoreOperation] in
+            guard (downloadFromCloudOperation.areaInfo != nil) else {
+                        addToStoreOperation.cancel()
+                        return
+                    }
+            addToStoreOperation.areaInfo = downloadFromCloudOperation.areaInfo
+        }
+
+        passCloudResultsToStore.addDependency(downloadFromCloudOperation)
+        addToStoreOperation.addDependency(passCloudResultsToStore)
+        
+        let fetchStoredAreaInfoOperation = FetchAreaInfoOperation(context: context)
+        let notifyUserIfNeededOperation = NotifyUserIfNeeded(context: context)
+        
+        let passDataToNotification = BlockOperation { [unowned fetchStoredAreaInfoOperation, unowned downloadFromCloudOperation, unowned notifyUserIfNeededOperation] in
+            guard let areaInfo = downloadFromCloudOperation.areaInfo  else {
+                notifyUserIfNeededOperation.cancel()
+                return
+            }
+            notifyUserIfNeededOperation.storedAreaInfo = fetchStoredAreaInfoOperation.result
+            notifyUserIfNeededOperation.freshAreaInfo = areaInfo
+        }
+        
+        passDataToNotification.addDependency(fetchStoredAreaInfoOperation)
+        passDataToNotification.addDependency(downloadFromCloudOperation)
+        notifyUserIfNeededOperation.addDependency(passDataToNotification)
+        
+        return [fetchLocationOperation, sendLocationToCloud, downloadFromCloudOperation,
+                fetchStoredAreaInfoOperation, passDataToNotification,
+                addToStoreOperation, passCloudResultsToStore, notifyUserIfNeededOperation]
+        }
+    }
+    
+    class NotifyUserIfNeeded: Operation {
+        var storedAreaInfo: AreaInfoEntry?
+        var freshAreaInfo: AreaInfo?
+        private let context: NSManagedObjectContext
+        let notificationManager = NotificationManager()
+        
+        init(context: NSManagedObjectContext) {
+            self.context = context
+        }
+        
+        override func main() {
+            guard let newStatusCode = freshAreaInfo?.statusCode else {return}
+            let oldStatusCode = storedAreaInfo?.statusCode
+
+            if(newStatusCode != oldStatusCode){
+                    notificationManager.registerForNotifications(statusCode: newStatusCode)
+            }
+           
         }
     }
 
 // Fetches the most recent location entry from the Core Data store.
-class FetchMostRecentLocationOperation: Operation {
+class FetchLocationOperation: Operation {
     private let context: NSManagedObjectContext
     
-    var result: LocationEntry?
+    var resultLocationEntry: LocationEntry?
     
     init(context: NSManagedObjectContext) {
         self.context = context
@@ -49,6 +101,33 @@ class FetchMostRecentLocationOperation: Operation {
                 let fetchResult = try context.fetch(request)
                 guard !fetchResult.isEmpty else { return }
                 
+                resultLocationEntry = fetchResult[0]
+            } catch {
+                print("Error fetching from context: \(error)")
+            }
+        }
+    }
+}
+
+class FetchAreaInfoOperation: Operation {
+    private let context: NSManagedObjectContext
+    
+    var result: AreaInfoEntry?
+    
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+    
+    override func main() {
+        let request: NSFetchRequest<AreaInfoEntry> = AreaInfoEntry.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(AreaInfoEntry.timestamp), ascending: false)]
+        request.fetchLimit = 1
+        
+        context.performAndWait {
+            do {
+                let fetchResult = try context.fetch(request)
+                guard !fetchResult.isEmpty else { return }
+                
                 result = fetchResult[0]
             } catch {
                 print("Error fetching from context: \(error)")
@@ -57,9 +136,13 @@ class FetchMostRecentLocationOperation: Operation {
     }
 }
 
-class TriggerCloudFunctionOperation : Operation {
+
+// trigger cloud function to calculate covid status in the area
+class DownloadFromCloudOperation : Operation {
     private let context: NSManagedObjectContext
     var functions = Functions.functions()
+    var areaInfo : AreaInfo?
+    
     
     enum OperationError: Error {
         case cancelled
@@ -136,9 +219,15 @@ class TriggerCloudFunctionOperation : Operation {
            
             self.finish(result: .failure(error))
           }
-        let resultTXT = (result?.data as? [String: Any])
-          if let resultText = (result?.data as? [String: Any])?["text"] as? String {
-            print(resultText)
+          if let resultData = (result?.data as? [String: Any]) {
+            let resultMessage = resultData["message"] as? String
+            print(resultMessage)
+            let resultStatusCode = resultData["statusCode"] as? String
+            let resultColor = resultData["color"] as? String
+            let resultCases = resultData["cases"] as? String
+            print(resultCases)
+            self.areaInfo = AreaInfo (timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: resultCases)
+        
             self.finish(result: .success([result]))
           }
         }
@@ -175,7 +264,7 @@ class AddLocationEntryToStoreOperation: Operation {
 }
 
 // Add entries returned from the server to the Core Data store.
-class AddAreaInfoEntryToStoreOperation: Operation {
+class AddAreaInfoToStoreOperation: Operation {
     private let context: NSManagedObjectContext
     var areaInfo: AreaInfo?
 
@@ -195,31 +284,43 @@ class AddAreaInfoEntryToStoreOperation: Operation {
             do {
                     _ = AreaInfoEntry(context: context, areaInfo: areaInfo)
                     
-                    print("Adding entry with timestamp: \(areaInfo.timestamp)")
+                    print("Adding entry areaInfo with timestamp: \(areaInfo.timestamp)")
                     
                     try context.save()
 
             } catch {
-                print("Error adding entries to store: \(error)")
+                print("Error adding areaInfo entries to store: \(error)")
             }
         }
     }
 }
 
-// A struct representing the response from the server for a single feed entry.
-struct AreaInfo: Codable {
-    let timestamp: Date
-    let dangerlevel: Int16
-    let message: String
+// Delete old entries  from the Core Data store.
+class DeleteAreaInfoEntriesOperation: Operation {
+    private let context: NSManagedObjectContext
+    
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+    // TODO implementation
 }
 
-// An extension to create a AreaInfoEntry object from the server representation of an entry.
+// A struct representing the response from the cloud.
+struct AreaInfo: Codable {
+    let timestamp: Date?
+    let statusCode: String?
+    let message: String?
+    let cases: String?
+}
+
+// An extension to create a AreaInfoEntry object from the cloud representation of an entry.
 extension AreaInfoEntry {
     convenience init(context: NSManagedObjectContext, areaInfo: AreaInfo) {
         self.init(context: context)
         self.message = areaInfo.message
-        self.dangerlevel = areaInfo.dangerlevel
+        self.statusCode = areaInfo.statusCode
         self.timestamp = areaInfo.timestamp
+        self.cases = areaInfo.cases
     }
 }
 
