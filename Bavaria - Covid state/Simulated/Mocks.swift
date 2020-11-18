@@ -20,7 +20,7 @@ extension NSPersistentContainer {
         let context = newBackgroundContext()
         context.perform {
             do {
-                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = AreaInfoEntry.fetchRequest()
+                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = FeedEntry.fetchRequest()
                 if !onlyIfNeeded {
                     // Delete all data currently in the store
                     let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: allEntriesRequest)
@@ -43,9 +43,9 @@ extension NSPersistentContainer {
         }
     }
     
-    private func generateFakeEntries(from date: Date, context: NSManagedObjectContext) -> [AreaInfoEntry] {
-        var entries = [AreaInfoEntry]()
-        let info = AreaInfoEntry.init(entity:  NSEntityDescription.entity(forEntityName: "text", in: context)!, insertInto: context)
+    private func generateFakeEntries(from date: Date, context: NSManagedObjectContext) -> [FeedEntry] {
+        var entries = [FeedEntry]()
+        let info = FeedEntry.init(entity:  NSEntityDescription.entity(forEntityName: "text", in: context)!, insertInto: context)
       
         entries.append(info)
       

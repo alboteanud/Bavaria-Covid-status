@@ -16,8 +16,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <textField opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7u9-9v-Uao" userLabel="Text Message">
+                                <rect key="frame" x="20" y="658" width="374" height="144"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GvF-PR-jFc">
-                                <rect key="frame" x="165" y="432" width="84" height="32"/>
+                                <rect key="frame" x="-6" y="432" width="84" height="32"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <state key="normal" title="Test Button"/>
                                 <connections>
@@ -28,15 +33,23 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="GvF-PR-jFc" secondAttribute="trailing" constant="336" id="1KH-lj-GRn"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="7u9-9v-Uao" secondAttribute="bottom" constant="60" id="6c1-Or-rFQ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="7u9-9v-Uao" secondAttribute="trailing" constant="20" id="FqK-zF-Xke"/>
                             <constraint firstItem="GvF-PR-jFc" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="G4Y-qZ-EOk"/>
-                            <constraint firstItem="GvF-PR-jFc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="165" id="TOM-Wh-fzZ"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="GvF-PR-jFc" secondAttribute="trailing" constant="165" id="fmc-0O-lbI"/>
+                            <constraint firstItem="7u9-9v-Uao" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="LJ4-oh-HLJ"/>
+                            <constraint firstItem="7u9-9v-Uao" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="YGf-5H-8Io"/>
+                            <constraint firstItem="7u9-9v-Uao" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="pNG-aS-Qsq"/>
+                            <constraint firstItem="7u9-9v-Uao" firstAttribute="top" secondItem="GvF-PR-jFc" secondAttribute="bottom" constant="194" id="zAF-7z-75Y"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="textMessageView" destination="7u9-9v-Uao" id="LlU-bq-Gsn"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-199" y="100"/>
+            <point key="canvasLocation" x="-200.00000000000003" y="99.776785714285708"/>
         </scene>
     </scenes>
     <resources>

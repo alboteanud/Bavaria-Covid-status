@@ -8,6 +8,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window:UIWindow?
     var locationManager = CLLocationManager()
+    private let server: Server = CloudServer()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -45,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         queue.maxConcurrentOperationCount = 1
         
         let context = PersistentContainer.shared.newBackgroundContext()
-        let operations = Operations.getOperationsToFetchCovidData(using: context)
+        let operations = Operations.getOperationsToFetchCovidData(using: context, server: server)
         let lastOperation = operations.last!
         
         task.expirationHandler = {
