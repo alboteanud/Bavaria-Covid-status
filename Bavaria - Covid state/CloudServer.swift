@@ -14,7 +14,6 @@ class CloudServer: Server {
     let functions = Functions.functions()
     func getCallTask(lat: String, lon: String, language: String, completion: @escaping (Result<[HTTPSCallableResult?], Error>) -> Void){
         
-     
         
        return functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
           if let error = error as NSError? {
@@ -64,12 +63,3 @@ static func hexStringToUIColor (hex:String) -> ServerEntry.Color {
     return ServerEntry.Color(red: red, blue: blue, green: green)
 }
 }
-
-//extension ServerEntry {
-//    static func makeColor(hex:String) -> ServerEntry {
-//        return ServerEntry(timestamp: timestamp,
-//                           firstColor: Color.makeRandom(),
-//                           secondColor: Color.makeRandom(),
-//                           gradientDirection: Double.random(in: 0..<360))
-//    }
-//}

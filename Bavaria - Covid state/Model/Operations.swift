@@ -40,13 +40,13 @@ struct Operations {
         passDataToNotification.addDependency(downloadFromCloudOperation)
         notifyUserIfNeededOperation.addDependency(passDataToNotification)
         
-        let addToStoreOperation = AddAreaInfoToStoreOperation(context: context)
+        let addToStoreOperation = AddEntriesToStoreOperation(context: context)
         let passCloudResultsToStore = BlockOperation { [unowned downloadFromCloudOperation, unowned addToStoreOperation] in
             guard (downloadFromCloudOperation.areaInfo != nil) else {
                         addToStoreOperation.cancel()
                         return
                     }
-            addToStoreOperation.areaInfo = downloadFromCloudOperation.areaInfo
+            addToStoreOperation.entry = downloadFromCloudOperation.areaInfo
         }
         passCloudResultsToStore.addDependency(downloadFromCloudOperation)
         addToStoreOperation.addDependency(passCloudResultsToStore)
@@ -96,6 +96,7 @@ extension FeedEntry {
         self.statusCode = areaInfo.statusCode
         self.timestamp = areaInfo.timestamp
         self.cases = areaInfo.cases
+        self.color = Color(areaInfo.color)
     }
 }
 
@@ -105,6 +106,7 @@ extension Color {
         self.init(red: color.red, green: color.green, blue: color.blue)
     }
 }
+
 
 // Fetches the most recent location entry from the Core Data store.
 class FetchLocationOperation: Operation {
@@ -239,7 +241,8 @@ class DownloadFromCloudOperation : Operation {
         
         let lat = currentLocation?.lat
         let lon = currentLocation?.lon
-        let language = NSLocale.current.languageCode
+        let language = Locale.current.languageCode
+        // String(Locale.preferredLanguages[0].prefix(2)) // Locale.current.languageCode // NSLocale.current.languageCode
         
         // move to api service
         functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
@@ -256,7 +259,7 @@ class DownloadFromCloudOperation : Operation {
             let color = ServerEntry.Color.hexStringToUIColor(hex: resultColor)
             let resultCases = resultData["cases"] as? String
             print(resultCases)
-            self.areaInfo = ServerEntry (timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: resultCases, color: color)
+            self.areaInfo = ServerEntry (color: color, timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: resultCases)
         
             self.finish(result: .success([result]))
           }
@@ -295,9 +298,9 @@ class AddLocationEntryToStoreOperation: Operation {
 }
 
 // Add entries returned from the server to the Core Data store.
-class AddAreaInfoToStoreOperation: Operation {
+class AddEntriesToStoreOperation: Operation {
     private let context: NSManagedObjectContext
-    var areaInfo: ServerEntry?
+    var entry: ServerEntry?
 
     init(context: NSManagedObjectContext) {
         self.context = context
@@ -305,11 +308,11 @@ class AddAreaInfoToStoreOperation: Operation {
     
     convenience init(context: NSManagedObjectContext, areaInfo: ServerEntry) {
         self.init(context: context)
-        self.areaInfo = areaInfo
+        self.entry = areaInfo
     }
     
     override func main() {
-        guard let areaInfo = areaInfo else { return }
+        guard let areaInfo = entry else { return }
 
         context.performAndWait {
             do {

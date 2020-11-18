@@ -10,7 +10,7 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
 
   // Message text passed from the client.
   const text = data.lat;
-  console.log(text);
+  // console.log(text);
 
   const response = await doRequest(data.lat, data.lon)
 
@@ -19,7 +19,7 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
   }
 
     const cases7_per_100k = response.features[0].attributes.cases7_per_100k
-    console.log('cases - ' + cases7_per_100k)
+    // console.log('cases - ' + cases7_per_100k)
     const covidStatus = calculateCovidStatus(cases7_per_100k)
 
     var language = data.language
@@ -34,13 +34,13 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
           text: "back response. Instruction message not found." 
         }
       } 
-        console.log(documentFromDB.data());
+        // console.log(documentFromDB.data());
   const resultData = {
     // // returning result to the client.
     message: documentFromDB.data().message, statusCode: covidStatus.code, color: covidStatus.color, cases: cases7_per_100k.toString()
   }
 
-  console.log(resultData)
+  // console.log(resultData)
   return resultData;
 
 
@@ -71,8 +71,7 @@ function calculateCovidStatus(cases) {
 }
 
 async function doRequest(lat, lon) {
-  const url = baseUrl 
-  // + '&geometry=' + '12' + '%2C' + '52';
+  const url = baseUrl  + '&geometry=' + '12' + '%2C' + '52';
 
   let promise = new Promise((resolve, reject) => {
 

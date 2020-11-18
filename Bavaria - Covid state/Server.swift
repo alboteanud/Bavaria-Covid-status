@@ -23,11 +23,6 @@ protocol Server {
 
 // A struct representing the response from the cloud.
 struct ServerEntry: Codable {
-    let timestamp: Date?
-    let statusCode: String?
-    let message: String?
-    let cases: String?
-    
     struct Color: Codable {
         var red: Double
         var blue: Double
@@ -35,4 +30,8 @@ struct ServerEntry: Codable {
     }
     
     let color: Color
+    let timestamp: Date?
+    let statusCode: String?
+    let message: String?
+    let cases: String?
 }

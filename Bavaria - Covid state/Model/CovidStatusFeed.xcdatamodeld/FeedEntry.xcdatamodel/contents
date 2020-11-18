@@ -2,7 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17511" systemVersion="20B29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="FeedEntry" representedClassName="FeedEntry" syncable="YES" codeGenerationType="class">
         <attribute name="cases" optional="YES" attributeType="String"/>
-        <attribute name="color" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData"/>
+        <attribute name="color" attributeType="Transformable" valueTransformerName="ColorTransformer" customClassName="Color"/>
         <attribute name="message" optional="YES" attributeType="String"/>
         <attribute name="statusCode" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

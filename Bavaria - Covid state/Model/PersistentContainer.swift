@@ -11,6 +11,7 @@ import CoreData
 class PersistentContainer : NSPersistentContainer {
     
     static let shared : NSPersistentContainer = {
+        ValueTransformer.setValueTransformer(ColorTransformer(), forName: NSValueTransformerName(rawValue: String(describing: ColorTransformer.self)))
        
         let container = NSPersistentContainer(name: "CovidStatusFeed")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

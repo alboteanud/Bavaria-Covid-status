@@ -1,3 +1,11 @@
+//
+//  ViewController.swift
+//  Bavaria - Covid state
+//
+//  Created by Dan Alboteanu on 07/11/2020.
+//
+// instruction for this app here https://docs.google.com/document/d/1O6K2SkQ6vV9R8ZDin4IZ_zm54xlNFPqqhIEVByo_NRs/edit?usp=sharing
+
 import UIKit
 import BackgroundTasks
 import CoreLocation
@@ -11,18 +19,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let server: Server = CloudServer()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         FirebaseApp.configure()
-        
-        PersistentContainer.shared.loadInitialData()
+//        PersistentContainer.shared.loadInitialData()
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.danalboteanu.apprefresh.CovidState", using: nil) { task in
             self.handleAppRefresh(task: task as! BGAppRefreshTask)
         }
      
         return true
     }
-    
- 
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         scheduleAppRefresh()
