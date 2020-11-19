@@ -43,27 +43,28 @@ extension NSPersistentContainer {
         }
     }
     
-    func insertFakeLocation3(context: NSManagedObjectContext){
-              let entity =
-                NSEntityDescription.entity(forEntityName: "LocationEntry",
+    // needs refractoring
+    func insertFakeLocation(context: NSManagedObjectContext) -> String? {
+        let entity = NSEntityDescription.entity(forEntityName: "LocationEntry",
                                            in: context)!
 //        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
-        let newLocation = getFakeLocation()
-              let entry = NSManagedObject(entity: entity, insertInto: context)
-        
-        entry.setValue(newLocation.name, forKeyPath: "name")
-        entry.setValue(newLocation.id, forKeyPath: "id")
-        entry.setValue(newLocation.lat, forKeyPath: "lat")
-        entry.setValue(newLocation.lon, forKeyPath: "lon")
-        entry.setValue(newLocation.timestamp, forKeyPath: "timestamp")
-        
-              // 4
-              do {
-                try context.save()
-        //        people.append(person)
-              } catch let error as NSError {
-                print("Could not save. \(error), \(error.userInfo)")
-              }
+        let fakeLocation = getFakeLocation()
+        let name = fakeLocation.name
+        print("will insert FakeLocation",fakeLocation.name)
+        let object = NSManagedObject(entity: entity, insertInto: context)
+        object.setValue(fakeLocation.name, forKeyPath: "name")
+        object.setValue(fakeLocation.id, forKeyPath: "id")
+        object.setValue(fakeLocation.lat, forKeyPath: "lat")
+        object.setValue(fakeLocation.lon, forKeyPath: "lon")
+        object.setValue(fakeLocation.timestamp, forKeyPath: "timestamp")
+
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+//        print("did insert FakeLocation",name)
+        return name
     }
     
     func addLocationToStore(location: CLLocation){
@@ -92,7 +93,7 @@ extension NSPersistentContainer {
         let location = locations[key]
         let lat = location![0]
         let lon = location![1]
-        return LocationEntry(context: context, location: CLLocation(latitude: lat, longitude: lon))
+        return LocationEntry(context: context, location: CLLocation(latitude: lat, longitude: lon), locationName: key)
       
     }
   

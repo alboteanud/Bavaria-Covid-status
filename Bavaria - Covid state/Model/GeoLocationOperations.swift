@@ -96,12 +96,12 @@ extension LocationEntry {
         self.id = 0   // if to replace previous entry location. Set this as main key in DB
 //        self.name = ""
     }
-//    convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
-//        self.init(context: context)
-//        self.lat = location.coordinate.latitude
-//        self.lon = location.coordinate.longitude
-//        self.timestamp = Date()
-//        self.id = 0   // if to replace previous entry location. Set this as main key in DB
-//        self.name = locationName
-//    }
+    convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
+        self.init(context: context)
+        self.lat = location.coordinate.latitude
+        self.lon = location.coordinate.longitude
+        self.timestamp = Date()
+        self.id = 0   // if to replace previous entry location. Set this as main key in DB
+        self.name = locationName
+    }
 }
