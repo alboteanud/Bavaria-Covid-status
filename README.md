@@ -1,6 +1,9 @@
 iOS application to show Covid cases in your area
 
-![Alt text](Screen1.png?raw=true "Title")
+<p align="center">
+  <img src="Screen1.png" width="350" title="Screenshot 1">
+  <img src="Screen1.png" width="350" alt="Screenshot 2">
+</p>
 
 Instructions to run
 Open a terminal at folder Bavaria covid state
