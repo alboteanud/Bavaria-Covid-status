@@ -108,7 +108,7 @@ class FetchLocationOperation: Operation {
     override func main() {
         let request: NSFetchRequest<LocationEntry> = LocationEntry.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(LocationEntry.timestamp), ascending: false)]
-        request.fetchLimit = 6
+        request.fetchLimit = 1
         
         context.performAndWait {
             do {
