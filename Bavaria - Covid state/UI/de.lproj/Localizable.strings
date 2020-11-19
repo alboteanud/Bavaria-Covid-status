@@ -1,0 +1,8 @@
+/* 
+  Localizable.strings
+  Bavaria - Covid state
+
+  Created by Dan Alboteanu on 19.11.2020.
+  
+*/
+"You have %@ Corona cases per 100k inhabitants" = "Sie haben %@ Corona-Fälle pro 100.000 Einwohner";

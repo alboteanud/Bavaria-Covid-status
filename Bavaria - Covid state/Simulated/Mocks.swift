@@ -43,6 +43,36 @@ extension NSPersistentContainer {
         }
     }
     
+    func addLocationToStore(location: CLLocation){
+        let context = PersistentContainer.shared.newBackgroundContext()
+        
+        let entry = LocationEntry(context: context, location: location)
+        let operation = AddLocationEntryToStoreOperation(context: context, locationEntry: entry)
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        queue.addOperation(operation)
+    }
+    
+    func insertFakeLocation() {
+        let newLocation = getFakeLocation()
+        let context = PersistentContainer.shared.newBackgroundContext()
+        print(newLocation.lat)
+        let operation = AddLocationEntryToStoreOperation(context: context, locationEntry: newLocation)
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 2
+        queue.addOperation(operation)
+    }
+    
+    private func getFakeLocation() -> LocationEntry {
+        let context = PersistentContainer.shared.newBackgroundContext()
+        let key = locations.keys.randomElement()!
+        let location = locations[key]
+        let lat = location![0]
+        let lon = location![1]
+        return LocationEntry(context: context, location: CLLocation(latitude: lat, longitude: lon))
+      
+    }
+  
     private func generateFakeEntries(from date: Date, context: NSManagedObjectContext) -> [FeedEntry] {
         var entries = [FeedEntry]()
         let info = FeedEntry.init(entity:  NSEntityDescription.entity(forEntityName: "text", in: context)!, insertInto: context)
@@ -132,5 +162,12 @@ extension NSPersistentContainer {
       
     }
     
+    
+    
 }
+
+var locations = ["Berlin": [52.531677, 13.3817],
+                 "Munich": [48.137154, 11.576124],
+                 "Dresden": [51.050407, 13.737262]
+]
 

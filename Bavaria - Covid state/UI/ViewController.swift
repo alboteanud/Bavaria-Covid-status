@@ -9,10 +9,10 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
-    var server = CloudServer()
-    var fetchRequest: NSFetchRequest<FeedEntry>!
+    private var server = CloudServer()
+    private var fetchRequest: NSFetchRequest<FeedEntry>!
     private var fetchedResultsController: NSFetchedResultsController<FeedEntry>!
-    var feedEntry: FeedEntry?
+    private var feedEntry: FeedEntry?
     
     @IBOutlet weak var updateButton: UIButton!
     @IBOutlet weak var colorView: UIView!
@@ -22,6 +22,9 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var locationTextView: UITextView!
  
+    @IBAction func onChangeLocationButtonClick(_ sender: Any) {
+        PersistentContainer.shared.insertFakeLocation()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,10 +65,9 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
         }
        }
     
-    @IBAction func onClick(_ sender: Any) {
+    @IBAction func onUpdateButtonClick(_ sender: Any) {
 //        NotificationManager().registerForNotifications(statusCode: "fake")
         updateEntries()
-        
     }
     
     private func updateEntries(){
@@ -104,7 +106,11 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
         let textToShow: String = entry.message! + dateString
         self.instructionsTextView.text =  textToShow
         
-        self.casesTextView.text = entry.cases
+        let cases = NumberFormatter.localizedString(from: Int(entry.cases) as NSNumber, number: .decimal)
+        let formatString = NSLocalizedString("You have %@ Corona cases per 100k inhabitants",
+                                             comment: "How many Coronavirus cases there are in the area per 100k people")
+        self.casesTextView.text = String.localizedStringWithFormat(formatString, cases)
+        
         
         let statusColor = entry.color!
         let myUIColor = UIColor(statusColor)
@@ -131,12 +137,7 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
     }
     
 }
-    
-    extension UIColor {
-        convenience init (_ color: Color) {
-            self.init(red: CGFloat(color.red), green: CGFloat(color.green), blue: CGFloat(color.blue), alpha: 1.0)
-        }
-    }
+
     
 
 

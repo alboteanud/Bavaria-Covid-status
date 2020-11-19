@@ -21,7 +21,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <state key="normal" title="Update"/>
                                 <connections>
-                                    <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="R5c-uu-RdG"/>
+                                    <action selector="onUpdateButtonClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Fvn-ZB-MFd"/>
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Q7e-18-gkI" userLabel="Instructions Text View">
@@ -45,6 +45,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fc4-Eq-ScF">
                                 <rect key="frame" x="149" y="94" width="116" height="30"/>
                                 <state key="normal" title="Change Location"/>
+                                <connections>
+                                    <action selector="onChangeLocationButtonClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="sAd-08-bHF"/>
+                                </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="vUW-kF-4ve" userLabel="Location Text View">
                                 <rect key="frame" x="50" y="154" width="314" height="50"/>

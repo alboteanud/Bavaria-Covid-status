@@ -52,18 +52,14 @@ extension AppDelegate : CLLocationManagerDelegate {
             
             let lastLocation = locations.last!
            print( "app delegate - lat: " , lastLocation.coordinate.latitude, Date())
-            let context = PersistentContainer.shared.newBackgroundContext()
-            
-            let entry = LocationEntry(context: context, lat: lastLocation.coordinate.latitude, lon: lastLocation.coordinate.longitude, timestamp: Date())
-            let operation = AddLocationEntryToStoreOperation(context: context, locationEntry: entry)
-            let queue = OperationQueue()
-            queue.maxConcurrentOperationCount = 1
-            queue.addOperation(operation)
+            PersistentContainer.shared.addLocationToStore(location: lastLocation)
         } else {
             // Do nothing
-            print("Cannot create a geofence because the user has not granted access to Location Services.")
+            print("Cannot create an location entry because the user has not granted access to Location Services.")
         }
     }
+    
+   
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error occured: \(error.localizedDescription).")
@@ -89,5 +85,26 @@ extension AppDelegate : CLLocationManagerDelegate {
             print("location unauthorised - denied")
             break
         }
+    }
+}
+
+// An extension to create a LocationEntry object from the CLLocation representation of an entry.
+extension LocationEntry {
+    
+    convenience init (context: NSManagedObjectContext, location: CLLocation) {
+        self.init(context: context)
+        self.lat = location.coordinate.latitude
+        self.lon = location.coordinate.longitude
+        self.timestamp = Date()
+        self.id = 0   // if to replace previous entry location. Set this as main key in DB
+        self.name = ""
+    }
+    convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
+        self.init(context: context)
+        self.lat = location.coordinate.latitude
+        self.lon = location.coordinate.longitude
+        self.timestamp = Date()
+        self.id = 0   // if to replace previous entry location. Set this as main key in DB
+        self.name = locationName
     }
 }

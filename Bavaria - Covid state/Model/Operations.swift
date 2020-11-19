@@ -29,12 +29,12 @@ struct Operations {
         let fetchFeedEntryOperation = FetchFeedEntryOperation(context: context)
         let notifyUserIfNeededOperation = NotifyUserIfNeeded(context: context)
         let passDataToNotification = BlockOperation { [unowned fetchFeedEntryOperation, unowned downloadFromCloudOperation, unowned notifyUserIfNeededOperation] in
-            guard let areaInfo = downloadFromCloudOperation.areaInfo  else {
+            guard case let .success(serverEntry)? = downloadFromCloudOperation.result else {
                 notifyUserIfNeededOperation.cancel()
                 return
             }
             notifyUserIfNeededOperation.storedAreaInfo = fetchFeedEntryOperation.result
-            notifyUserIfNeededOperation.freshAreaInfo = areaInfo
+            notifyUserIfNeededOperation.freshAreaInfo = serverEntry
         }
         passDataToNotification.addDependency(fetchFeedEntryOperation)
         passDataToNotification.addDependency(downloadFromCloudOperation)
@@ -42,11 +42,11 @@ struct Operations {
         
         let addToStoreOperation = AddEntriesToStoreOperation(context: context)
         let passCloudResultsToStore = BlockOperation { [unowned downloadFromCloudOperation, unowned addToStoreOperation] in
-            guard (downloadFromCloudOperation.areaInfo != nil) else {
-                        addToStoreOperation.cancel()
-                        return
-                    }
-            addToStoreOperation.entry = downloadFromCloudOperation.areaInfo
+        guard case let .success(serverEntry)? = downloadFromCloudOperation.result else {
+                addToStoreOperation.cancel()
+                return
+            }
+            addToStoreOperation.entry = serverEntry
         }
         passCloudResultsToStore.addDependency(downloadFromCloudOperation)
         addToStoreOperation.addDependency(passCloudResultsToStore)
@@ -77,16 +77,6 @@ struct Operations {
            
         }
     }
-
-extension LocationEntry {
-    convenience init (context: NSManagedObjectContext, lat: Double, lon: Double, timestamp: Date) {
-        self.init(context: context)
-        self.lat = lat
-        self.lon = lon
-        self.timestamp = timestamp
-        self.id = 0   // replace previous entry location
-    }
-}
 
 // An extension to create a FeedEntry object from the cloud representation of an entry.
 extension FeedEntry {
@@ -128,7 +118,7 @@ class FetchLocationOperation: Operation {
                 let fetchResult = try context.fetch(request)
                 guard !fetchResult.isEmpty else { return }
                 fetchResult.forEach{ element in
-                    print("location", element.lat, element.timestamp)
+                    print("location fetched from local DB (lat, lon, stored at):", element.lat, element.lon, element.timestamp)
                 }
                 resultLocationEntry = fetchResult[0]
             } catch {
@@ -170,11 +160,11 @@ class FetchFeedEntryOperation: Operation {
 }
 
 // Trigger cloud function to calculate covid status in the area.
-// Tribute to https://developer.apple.com/videos/play/wwdc2019/707 for this class
+// Tribute to https://developer.apple.com/videos/play/wwdc2019/707
 class DownloadFromCloudOperation : Operation {
     private let context: NSManagedObjectContext
     var functions = Functions.functions()
-    var areaInfo : ServerEntry?
+//    var areaInfo : ServerEntry?
     private let server: Server
     
     enum OperationError: Error {
@@ -182,7 +172,7 @@ class DownloadFromCloudOperation : Operation {
     }
     
     var currentLocation : LocationEntry?
-    var result: Result<[HTTPSCallableResult?], Error>?
+    var result: Result<ServerEntry, Error>?
     private var downloading = false
     private var currentDownloadTask: DownloadTask?
     
@@ -215,7 +205,7 @@ class DownloadFromCloudOperation : Operation {
         }
     }
     
-    func finish(result: Result<[HTTPSCallableResult?], Error>) {
+        func finish(result: Result<ServerEntry, Error>) {
         guard downloading else { return }
         
         willChangeValue(forKey: #keyPath(isExecuting))
@@ -238,33 +228,7 @@ class DownloadFromCloudOperation : Operation {
             finish(result: .failure(OperationError.cancelled))
             return
         }
-        
-        let lat = currentLocation?.lat
-        let lon = currentLocation?.lon
-        let language = Locale.current.languageCode
-        // String(Locale.preferredLanguages[0].prefix(2)) // Locale.current.languageCode // NSLocale.current.languageCode
-        
-        // move to api service
-        functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
-          if let error = error as NSError? {
-           
-            self.finish(result: .failure(error))
-          }
-         
-          if let resultData = (result?.data as? [String: Any]) {
-            let resultMessage = resultData["message"] as? String
-            print(resultMessage)
-            let resultStatusCode = resultData["statusCode"] as? String
-            let resultColor = resultData["color"] as! String
-            let color = ServerEntry.Color.hexStringToUIColor(hex: resultColor)
-            let resultCases = resultData["cases"] as? String
-            print(resultCases)
-            self.areaInfo = ServerEntry (color: color, timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: resultCases)
-        
-            self.finish(result: .success([result]))
-          }
-        }
-//        server.getCallTask(lat: lat, lon: lon, language: language, completion: finish)
+        server.callCloudFunction(location: currentLocation, completion: finish)
     }
 }
 
@@ -279,19 +243,20 @@ class AddLocationEntryToStoreOperation: Operation {
     convenience init(context: NSManagedObjectContext, locationEntry: LocationEntry) {
         self.init(context: context)
         self.locationEntry = locationEntry
+        print(locationEntry.lat)
     }
     
     override func main() {
         guard let locationEntry = locationEntry else { return }
-
+        print(locationEntry.lat)
         context.performAndWait {
             do {
-                _ = LocationEntry(context: context, lat: locationEntry.lat, lon: locationEntry.lon, timestamp: locationEntry.timestamp!)
-                    print("Adding entry with timestamp: \(locationEntry.timestamp)")
+                _ = locationEntry
+                print("Adding to DB location entry with lat: \(locationEntry.lat)")
                     try context.save()
                 
             } catch {
-                print("Error adding entries to store: \(error)")
+                print("Error adding location entriy to store: \(error)")
             }
         }
     }

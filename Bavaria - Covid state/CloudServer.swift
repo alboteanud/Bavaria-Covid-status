@@ -11,30 +11,40 @@ import Firebase
 class CloudServer: Server {
     
     static let sharedInstance = CloudServer()
-    let functions = Functions.functions()
-    func getCallTask(lat: String, lon: String, language: String, completion: @escaping (Result<[HTTPSCallableResult?], Error>) -> Void){
+    lazy var functions : Functions = Functions.functions()
+    
+    func callCloudFunction(location : LocationEntry?, completion: @escaping (Result<ServerEntry, Error>) -> Void){
+        guard let location = location else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
+            return
+        }
+        let language = Locale.current.languageCode
+        let lat = location.lat
+        let lon = location.lon
         
+//        let functions = Functions.functions()
         
-       return functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
-          if let error = error as NSError? {
+        functions.httpsCallable("calculateCovidStatus").call(["lat": lat, "lon": lon, "language": language]) { (result, error) in
+           if let error = error as NSError? {
+            
+            completion(.failure(error))
+           }
+           guard let resultData = (result?.data as? [String: Any]) ,
+              let resultMessage = resultData["message"] as? String,
+//              print(resultMessage)
+              let resultStatusCode = resultData["statusCode"] as? String,
+              let resultColor = resultData["color"] as? String,
+              let cases = resultData["cases"] as? Float
+//              print(cases)
+            else {
+                completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
+                return }
+            let color = ServerEntry.Color.hexStringToUIColor(hex: resultColor)
+            let entry = ServerEntry (color: color, timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: cases)
+
+             completion(.success(entry))
            
-//            self.finish(result: .failure(error))
-          }
-            // move to api service
-          if let resultData = (result?.data as? [String: Any]) {
-            let resultMessage = resultData["message"] as? String
-            print(resultMessage)
-            let resultStatusCode = resultData["statusCode"] as? String
-            let resultColor = resultData["color"] as? String
-            let resultCases = resultData["cases"] as? String
-            print(resultCases)
-//            self.areaInfo = AreaInfo (timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: resultCases)
-        
-//            self.finish(result: .success([result]))
-          }
-       }
-        
-        
+        }
     }
     
 }
@@ -62,4 +72,10 @@ static func hexStringToUIColor (hex:String) -> ServerEntry.Color {
     
     return ServerEntry.Color(red: red, blue: blue, green: green)
 }
+}
+
+extension UIColor {
+    convenience init (_ color: Color) {
+        self.init(red: CGFloat(color.red), green: CGFloat(color.green), blue: CGFloat(color.blue), alpha: 1.0)
+    }
 }

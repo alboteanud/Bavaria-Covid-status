@@ -15,9 +15,7 @@ protocol DownloadTask {
 }
 
 protocol Server {
-//    func fetchMovies(since startDate: Date, completion: @escaping (Result<[ServerEntry], Error>) -> Void)-> URLSessionDataTask?
-   
-    func getCallTask(lat: String, lon: String, language: String, completion: @escaping (Result<[HTTPSCallableResult?], Error>) -> Void)
+    func callCloudFunction(location : LocationEntry?, completion: @escaping (Result<ServerEntry, Error>) -> Void)
 }
 
 
@@ -33,5 +31,9 @@ struct ServerEntry: Codable {
     let timestamp: Date?
     let statusCode: String?
     let message: String?
-    let cases: String?
+    let cases: Float
 }
+
+
+
+

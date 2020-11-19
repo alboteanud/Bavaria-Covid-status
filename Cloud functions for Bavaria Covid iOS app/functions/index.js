@@ -35,9 +35,10 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
         }
       } 
         // console.log(documentFromDB.data());
+        const cases = Math.fround(cases7_per_100k);
   const resultData = {
     // // returning result to the client.
-    message: documentFromDB.data().message, statusCode: covidStatus.code, color: covidStatus.color, cases: cases7_per_100k.toString()
+    message: documentFromDB.data().message, statusCode: covidStatus.code, color: covidStatus.color, cases: cases
   }
 
   // console.log(resultData)
@@ -71,7 +72,8 @@ function calculateCovidStatus(cases) {
 }
 
 async function doRequest(lat, lon) {
-  const url = baseUrl  + '&geometry=' + '12' + '%2C' + '52';
+  const url = baseUrl  
+  // + '&geometry=' + '12' + '%2C' + '52';
 
   let promise = new Promise((resolve, reject) => {
 

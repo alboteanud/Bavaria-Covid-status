@@ -21,6 +21,7 @@ class NotificationManager: NSObject {
         }
     }
 
+    // TODO add to localised strings
     func setupAndGenerateLocalNotification(statusCode: String) {
         let content = UNMutableNotificationContent()
         content.title = "Covid status Notification"

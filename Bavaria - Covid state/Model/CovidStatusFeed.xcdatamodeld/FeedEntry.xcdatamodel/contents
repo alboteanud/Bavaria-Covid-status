@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17511" systemVersion="20B29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="FeedEntry" representedClassName="FeedEntry" syncable="YES" codeGenerationType="class">
-        <attribute name="cases" optional="YES" attributeType="String"/>
+        <attribute name="cases" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="color" attributeType="Transformable" valueTransformerName="ColorTransformer" customClassName="Color"/>
         <attribute name="message" optional="YES" attributeType="String"/>
         <attribute name="statusCode" optional="YES" attributeType="String"/>
@@ -14,6 +14,7 @@
         <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="lat" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lon" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <userInfo>
             <entry key="key" value="timestamp"/>
@@ -21,6 +22,6 @@
     </entity>
     <elements>
         <element name="FeedEntry" positionX="160" positionY="192" width="128" height="104"/>
-        <element name="LocationEntry" positionX="-63" positionY="9" width="128" height="89"/>
+        <element name="LocationEntry" positionX="-63" positionY="9" width="128" height="104"/>
     </elements>
 </model>
