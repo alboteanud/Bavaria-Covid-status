@@ -9,7 +9,7 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
-    private var server = CloudServer()
+    private var server = FirebaseServer()
     private var fetchRequest: NSFetchRequest<FeedEntry>!
     private var fetchedResultsController: NSFetchedResultsController<FeedEntry>!
     private var feedEntry: FeedEntry?
@@ -26,7 +26,6 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
         if let fakeLocationName = PersistentContainer.shared.insertFakeLocation(context: PersistentContainer.shared.viewContext){
             locationTextView.text = fakeLocationName
         }
-       
     }
     
     override func viewDidLoad() {

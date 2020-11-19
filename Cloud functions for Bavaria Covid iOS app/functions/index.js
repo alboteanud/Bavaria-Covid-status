@@ -31,7 +31,7 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
     if (!documentFromDB.exists) {
         console.log('No such document!');
         return {
-          text: "back response. Instruction message not found." 
+          errorText: "Back response from server. Covid data not found for given area." 
         }
       } 
         // console.log(documentFromDB.data());

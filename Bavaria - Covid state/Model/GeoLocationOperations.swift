@@ -15,10 +15,10 @@ extension AppDelegate : CLLocationManagerDelegate {
     // should be done only first time, if position is not present in DB  
     // The system wakes up the app to handle location updates.
     // Reconfigure it to get location updates
-        if (launchOptions?[.location]) != nil  {
-        initLocationManager()
-        getLocation()
-        }
+//        if (launchOptions?[.location]) != nil  {
+            initLocationManager()
+            getLocation()
+//        }
     
         return true
     }
@@ -56,8 +56,6 @@ extension AppDelegate : CLLocationManagerDelegate {
         }
     }
     
-   
-
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error occured: \(error.localizedDescription).")
     }
@@ -94,7 +92,7 @@ extension LocationEntry {
         self.lon = location.coordinate.longitude
         self.timestamp = Date()
         self.id = 0   // if to replace previous entry location. Set this as main key in DB
-//        self.name = ""
+        self.name = "Your location"
     }
     convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
         self.init(context: context)

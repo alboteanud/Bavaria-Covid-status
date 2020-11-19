@@ -13,37 +13,8 @@ struct Mocks {
 }
 
 extension NSPersistentContainer {
-   
-    // Fills the Core Data store with initial fake data
-    // If onlyIfNeeded is true, only does so if the store is empty
-    func loadInitialData(onlyIfNeeded: Bool = true) {
-        let context = newBackgroundContext()
-        context.perform {
-            do {
-                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = FeedEntry.fetchRequest()
-                if !onlyIfNeeded {
-                    // Delete all data currently in the store
-                    let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: allEntriesRequest)
-                    deleteAllRequest.resultType = .resultTypeObjectIDs
-                    let result = try context.execute(deleteAllRequest) as? NSBatchDeleteResult
-                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: result?.result as Any],
-                                                        into: [self.viewContext])
-                }
-                if try !onlyIfNeeded || context.count(for: allEntriesRequest) == 0 {
-                    let now = Date()
-                    
-//                    _ = self.generateFakeEntries(from: now, context: context).map { _ in AreaInfo(context: context) }
-                    try context.save()
-                    
-//                    self.lastCleaned = nil
-                }
-            } catch {
-                print("Could not load initial data due to \(error)")
-            }
-        }
-    }
     
-    // needs refractoring
+    // TODO  refractoring
     func insertFakeLocation(context: NSManagedObjectContext) -> String? {
         let entity = NSEntityDescription.entity(forEntityName: "LocationEntry",
                                            in: context)!
@@ -63,7 +34,7 @@ extension NSPersistentContainer {
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
-//        print("did insert FakeLocation",name)
+        print("did insert FakeLocation",name)
         return name
     }
     
@@ -106,15 +77,6 @@ extension NSPersistentContainer {
         return entries
     }
     
-    //        fetchData(urlString: urlString) { (result) in
-    //            switch result {
-    //            case .Success(let data):
-    //                print(data)
-    //            case .Error(let message):
-    //                print("error", message)
-    //            }
-    //        }
-    
     enum Result<T> {
         case Success(T)
         case Error(String)
@@ -137,7 +99,7 @@ extension NSPersistentContainer {
     // }]
     
     func fetchData(completion: @escaping (Result<Double>) -> Void) {
-        let urlString = "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=cases7_per_100k&geometry=12%2C52&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&returnGeometry=false&outSR=4326&f=json"
+    let urlString="https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=cases7_per_100k&geometry=12%2C52&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&returnGeometry=false&outSR=4326&f=json"
         
         guard let url = URL(string: urlString) else { return completion(.Error("Invalid URL")) }
         
@@ -184,6 +146,35 @@ extension NSPersistentContainer {
         
         locationManager.requestLocation()
       
+    }
+    
+    // Fills the Core Data store with initial fake data
+    // If onlyIfNeeded is true, only does so if the store is empty
+    func loadInitialData(onlyIfNeeded: Bool = true) {
+        let context = newBackgroundContext()
+        context.perform {
+            do {
+                let allEntriesRequest: NSFetchRequest<NSFetchRequestResult> = FeedEntry.fetchRequest()
+                if !onlyIfNeeded {
+                    // Delete all data currently in the store
+                    let deleteAllRequest = NSBatchDeleteRequest(fetchRequest: allEntriesRequest)
+                    deleteAllRequest.resultType = .resultTypeObjectIDs
+                    let result = try context.execute(deleteAllRequest) as? NSBatchDeleteResult
+                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: result?.result as Any],
+                                                        into: [self.viewContext])
+                }
+                if try !onlyIfNeeded || context.count(for: allEntriesRequest) == 0 {
+                    let now = Date()
+                    
+//                    _ = self.generateFakeEntries(from: now, context: context).map { _ in AreaInfo(context: context) }
+                    try context.save()
+                    
+//                    self.lastCleaned = nil
+                }
+            } catch {
+                print("Could not load initial data due to \(error)")
+            }
+        }
     }
     
 }

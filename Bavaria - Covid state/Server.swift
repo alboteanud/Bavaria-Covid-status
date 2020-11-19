@@ -18,8 +18,7 @@ protocol Server {
     func callCloudFunction(location : LocationEntry?, completion: @escaping (Result<ServerEntry, Error>) -> Void)
 }
 
-
-// A struct representing the response from the cloud.
+// A struct representing the response from the Firebase Function.
 struct ServerEntry: Codable {
     struct Color: Codable {
         var red: Double
