@@ -12,10 +12,7 @@ extension AppDelegate : CLLocationManagerDelegate {
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
-    // only first time, if position is not present in DB
-        initLocationManager()
-        getLocation()
-    
+    // should be done only first time, if position is not present in DB  
     // The system wakes up the app to handle location updates.
     // Reconfigure it to get location updates
         if (launchOptions?[.location]) != nil  {
@@ -51,7 +48,7 @@ extension AppDelegate : CLLocationManagerDelegate {
             CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
             
             let lastLocation = locations.last!
-           print( "app delegate - lat: " , lastLocation.coordinate.latitude, Date())
+           print( "app delegate. LocationManager - didUpdateLocations. Latitude: " , lastLocation.coordinate.latitude, Date())
             PersistentContainer.shared.addLocationToStore(location: lastLocation)
         } else {
             // Do nothing
@@ -97,14 +94,14 @@ extension LocationEntry {
         self.lon = location.coordinate.longitude
         self.timestamp = Date()
         self.id = 0   // if to replace previous entry location. Set this as main key in DB
-        self.name = ""
+//        self.name = ""
     }
-    convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
-        self.init(context: context)
-        self.lat = location.coordinate.latitude
-        self.lon = location.coordinate.longitude
-        self.timestamp = Date()
-        self.id = 0   // if to replace previous entry location. Set this as main key in DB
-        self.name = locationName
-    }
+//    convenience init (context: NSManagedObjectContext, location: CLLocation, locationName: String) {
+//        self.init(context: context)
+//        self.lat = location.coordinate.latitude
+//        self.lon = location.coordinate.longitude
+//        self.timestamp = Date()
+//        self.id = 0   // if to replace previous entry location. Set this as main key in DB
+//        self.name = locationName
+//    }
 }

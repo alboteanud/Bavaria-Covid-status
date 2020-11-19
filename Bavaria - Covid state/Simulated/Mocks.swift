@@ -43,6 +43,29 @@ extension NSPersistentContainer {
         }
     }
     
+    func insertFakeLocation3(context: NSManagedObjectContext){
+              let entity =
+                NSEntityDescription.entity(forEntityName: "LocationEntry",
+                                           in: context)!
+//        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
+        let newLocation = getFakeLocation()
+              let entry = NSManagedObject(entity: entity, insertInto: context)
+        
+        entry.setValue(newLocation.name, forKeyPath: "name")
+        entry.setValue(newLocation.id, forKeyPath: "id")
+        entry.setValue(newLocation.lat, forKeyPath: "lat")
+        entry.setValue(newLocation.lon, forKeyPath: "lon")
+        entry.setValue(newLocation.timestamp, forKeyPath: "timestamp")
+        
+              // 4
+              do {
+                try context.save()
+        //        people.append(person)
+              } catch let error as NSError {
+                print("Could not save. \(error), \(error.userInfo)")
+              }
+    }
+    
     func addLocationToStore(location: CLLocation){
         let context = PersistentContainer.shared.newBackgroundContext()
         
@@ -55,11 +78,11 @@ extension NSPersistentContainer {
     
     func insertFakeLocation() {
         let newLocation = getFakeLocation()
-        let context = PersistentContainer.shared.newBackgroundContext()
-        print(newLocation.lat)
+        let context = PersistentContainer.shared.viewContext
+        print("inserting FakeLocation in DB ",newLocation.lat, newLocation.lon)
         let operation = AddLocationEntryToStoreOperation(context: context, locationEntry: newLocation)
         let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 2
+        queue.maxConcurrentOperationCount = 1
         queue.addOperation(operation)
     }
     

@@ -23,7 +23,44 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
     @IBOutlet weak var locationTextView: UITextView!
  
     @IBAction func onChangeLocationButtonClick(_ sender: Any) {
-        PersistentContainer.shared.insertFakeLocation()
+//        PersistentContainer.shared.insertFakeLocation()
+        
+        // Save changes in the application's managed object context when the application transitions to the background.
+//        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+        save()
+    }
+    
+    func save() {
+      
+      guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+        return
+      }
+      
+        let managedContext = PersistentContainer.shared.viewContext
+//       appDelegate.persistentContainer.viewContext
+        PersistentContainer.shared.insertFakeLocation3(context: managedContext)
+      
+//      let entity =
+//        NSEntityDescription.entity(forEntityName: "LocationEntry",
+//                                   in: managedContext)!
+//fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
+//
+//      let person = NSManagedObject(entity: entity, insertInto: managedContext)
+//
+//      person.setValue("Berlin", forKeyPath: "name")
+//        person.setValue(1, forKeyPath: "id")
+//        person.setValue(52.000, forKeyPath: "lat")
+//        person.setValue(13.3817, forKeyPath: "lon")
+//        person.setValue(Date(), forKeyPath: "timestamp")
+////        "Berlin": [52.531677, 13.3817],
+//
+//      // 4
+//      do {
+//        try managedContext.save()
+////        people.append(person)
+//      } catch let error as NSError {
+//        print("Could not save. \(error), \(error.userInfo)")
+//      }
     }
     
     override func viewDidLoad() {
@@ -31,6 +68,26 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
         
         initFetchedResultsController()
         fetchFeedEntry()
+    }
+    
+   func viewDidLoad2() {
+        super.viewDidLoad()
+        
+        
+        if fetchRequest == nil {
+            fetchRequest = FeedEntry.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
+        }
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+                                                              managedObjectContext: PersistentContainer.shared.viewContext,
+                                                              sectionNameKeyPath: nil,
+                                                              cacheName: String(describing: self))
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            print("Error fetching results: \(error)")
+        }
     }
     
     func initFetchedResultsController()  {
@@ -66,7 +123,6 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
        }
     
     @IBAction func onUpdateButtonClick(_ sender: Any) {
-//        NotificationManager().registerForNotifications(statusCode: "fake")
         updateEntries()
     }
     
@@ -111,14 +167,10 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
                                              comment: "How many Coronavirus cases there are in the area per 100k people")
         self.casesTextView.text = String.localizedStringWithFormat(formatString, cases)
         
-        
         let statusColor = entry.color!
         let myUIColor = UIColor(statusColor)
         self.colorView.backgroundColor = myUIColor
-        
     }
-    
-    
     
     private func showLoadingUI(){
         activityIndicator.isHidden = false

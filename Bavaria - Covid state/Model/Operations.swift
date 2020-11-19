@@ -70,11 +70,9 @@ struct Operations {
         override func main() {
             guard let newStatusCode = freshAreaInfo?.statusCode else {return}
             let oldStatusCode = storedAreaInfo?.statusCode
-
             if(newStatusCode != oldStatusCode){
                     notificationManager.registerForNotifications(statusCode: newStatusCode)
             }
-           
         }
     }
 
@@ -97,7 +95,6 @@ extension Color {
     }
 }
 
-
 // Fetches the most recent location entry from the Core Data store.
 class FetchLocationOperation: Operation {
     private let context: NSManagedObjectContext
@@ -111,7 +108,7 @@ class FetchLocationOperation: Operation {
     override func main() {
         let request: NSFetchRequest<LocationEntry> = LocationEntry.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(LocationEntry.timestamp), ascending: false)]
-        request.fetchLimit = 1
+        request.fetchLimit = 6
         
         context.performAndWait {
             do {
@@ -149,7 +146,7 @@ class FetchFeedEntryOperation: Operation {
                 guard !fetchResult.isEmpty else { return }
                 print(fetchResult.count)
                 fetchResult.forEach{ (element) in
-                    print(element.timestamp, element.cases)
+                    print("FetchFeedEntryOperation entry: ", element.timestamp, element.cases, element.color)
                 }
                 result = fetchResult[0]
             } catch {
@@ -243,7 +240,7 @@ class AddLocationEntryToStoreOperation: Operation {
     convenience init(context: NSManagedObjectContext, locationEntry: LocationEntry) {
         self.init(context: context)
         self.locationEntry = locationEntry
-        print(locationEntry.lat)
+//        print(locationEntry.lat)
     }
     
     override func main() {
@@ -252,7 +249,7 @@ class AddLocationEntryToStoreOperation: Operation {
         context.performAndWait {
             do {
                 _ = locationEntry
-                print("Adding to DB location entry with lat: \(locationEntry.lat)")
+                print("Adding location entry to DB. Lat: \(locationEntry.lat)")
                     try context.save()
                 
             } catch {

@@ -2,10 +2,11 @@ iOS application to show Covid cases in your area
 
 <p align="center">
   <img src="Screen1.png" width="350" title="Screenshot 1 iPad">
-  <img src="Screen2.png" width="350" alt="Screenshot 2 iPad">
+  <img src="Screen3.png" width="350" alt="Screenshot 3 iPad">
 </p>
 
 Instructions to run
+
 Open a terminal at folder Bavaria covid state
 Run pod init and pod install
 Open the newly created xcworkspace file
@@ -20,7 +21,7 @@ How the Firebase Cloud Function and Firestore DB works
 
 Geolocation data (latitude, longitude) are sent to the cloud function along with the user’s device language. The cloud function creates a request to the Covid database server, including the user’s geolocation coordinates. It receives back the json response that will parse and calculate the Covid status code (green, yello, red, darkRed) based on the configuration file with the status code limits. 
 The status code is used (by the cloud function) to get the appropriate message instruction from Firestore (a Google Cloud Database). The message will be in english, german or romanian accordingly. 
-The response sent back to the client includes: Covid status code, color, message instructions and cases per 100k people.
+The response sent back to the client includes: Covid status code, color, message instructions and cases per 100k people. To see the code, check out the index.js file inside Cloud Functions directory of the project.
 
 
 Objectives for today Saturday 14th of November 2020
@@ -82,7 +83,7 @@ Function execution took 233 ms, finished with status code: 200
 The change in the device preferred language is reflected in the user interface. Instruction messages for Covid protection are shown in german, english and romanian.
 All color code are shown - choose fake location and update
 
-Inserting fake location is yet to be debugged
+Inserting fake locations is yet to be debugged.
 
 
 Requirements for this app

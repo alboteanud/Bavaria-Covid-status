@@ -73,7 +73,8 @@ function calculateCovidStatus(cases) {
 
 async function doRequest(lat, lon) {
   const url = baseUrl  
-  // + '&geometry=' + '12' + '%2C' + '52';
+  // + '&geometry=' + '12' + '%2C' + '52';   // for test
+  + '&geometry=' + lon + '%2C' + lat;
 
   let promise = new Promise((resolve, reject) => {
 
