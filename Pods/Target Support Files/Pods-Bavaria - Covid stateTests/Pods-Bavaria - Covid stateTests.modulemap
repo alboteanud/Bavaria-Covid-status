@@ -1,0 +1,6 @@
+framework module Pods_Bavaria___Covid_stateTests {
+  umbrella header "Pods-Bavaria - Covid stateTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

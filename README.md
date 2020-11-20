@@ -1,37 +1,41 @@
-iOS application to show Covid cases in your area
+### iOS application to show Covid cases in your area
 
 <p align="center">
   <img src="Screen1.png" width="350" title="Screenshot 1 iPad">
   <img src="Screen3.png" width="350" alt="Screenshot 3 iPad">
 </p>
 
-Instructions to run
+### Instructions to run
 
 Open a terminal at folder Bavaria covid state
 Run pod init and pod install
 Open the newly created xcworkspace file
 
+### Note to the evaluator
 
-How the app works
+Make comments for me inside the code and do NOT be kind. Any information is wellcomed. 
+
+
+### How the app works
 
 The app stores the user location as an entry in Core Data. The location entry gets updated every time the system notifies the app about a significant location change, even in the background.
 Every 10 minutes the background task scheduler fires to trigger a process - Firebase Cloud Function - that will eventually send back area information (including Covid status and instruction messages for the user). The area information is stored in the Core Data and compared to the old one in order to notify the user on new status code.
 
-How the Firebase Cloud Function and Firestore DB works
+### How the Firebase Cloud Function and Firestore DB works
 
 Geolocation data (latitude, longitude) are sent to the cloud function along with the user’s device language. The cloud function creates a request to the Covid database server, including the user’s geolocation coordinates. It receives back the json response that will parse and calculate the Covid status code (green, yello, red, darkRed) based on the configuration file with the status code limits. 
 The status code is used (by the cloud function) to get the appropriate message instruction from Firestore (a Google Cloud Database). The message will be in english, german or romanian accordingly. 
 The response sent back to the client includes: Covid status code, color, message instructions and cases per 100k people. To see the code, check out the index.js file inside Cloud Functions directory of the project.
 
 
-Objectives for today Saturday 14th of November 2020
+### Objectives for today Saturday 14th of November 2020
 
 iOS device sends its coord (lat, lon) and language to cloud function every 10 min or on press of a button
 Cloud function responds back with the Danger Level in the area and a message for the user. To do that, the cloud function will first interrogate the NpGeo DB with covid cases, parse json response, analyse the danger level, get the appropriate message from the Cloud Firestore database.
 The iOS device receives the response from the cloud function, stores response time, danger level and message for the user. Shows a notification if needed.
 
 
-Objectives for today Monday 16th of  November
+### Objectives for today Monday 16th of  November
 
 Add real lat, lon coord to url in cloud function
 Get message alert to show in desired language - from Firestore
@@ -42,14 +46,14 @@ Change app UI color and text message
 UI - show location name - if time allows - using coord and Google Maps API
 
 
-Objectives for today Tuesday 17th of November
+### Objectives for today Tuesday 17th of November
 
 Think about UI. User screen, testing screen
 Build a UI sketch in Adobe XD
 Write a function - observe a managed object context. Handling notifications.
 
 
-Objectives for today Wednesday 18th of November
+### Objectives for today Wednesday 18th of November
 
 Bug fixing
 Notification is not shown
@@ -59,8 +63,16 @@ Testing. Write tests.
 Texts internationalisation
 Notifications on tribute code
 
+### Objectives for today Friday 20th of November
 
-Tests performed
+Even if the test time has ended, I still want to make some changes to the project:
+Improve the README file
+Add pods to commit so that to facillitate dodnloading and running the project
+Add lat, lon to the client response and store it in the ServerEntry
+Cloud Functions - add Google Maps - convert lat, lon into to location name
+
+
+### Tests performed
 
 The app self updates with location (lat, lon) even during the night. Stores location in Core Data. Check out the logs with stored coordinates (latitude printed): 
 location 44.312587807603784 Optional(2020-11-18 09:22:07 +0000)
@@ -86,7 +98,8 @@ All color code are shown - choose fake location and update
 Inserting fake locations is yet to be debugged.
 
 
-Requirements for this app
+### Requirements for this app
+
 The "fictive" User-Story:
 
 You have to build an application for the federal state of Bavaria which's main goal
