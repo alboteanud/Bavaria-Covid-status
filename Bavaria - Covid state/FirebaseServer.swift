@@ -26,33 +26,44 @@ class FirebaseServer: Server {
            if let error = error as NSError? {
             completion(.failure(error))
            }
-            guard let resultData = (result?.data as? [String: Any]) else {
-                 completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
-                print("functions.httpsCallable says: no result data from cloud functions")
-                 return
-             }
-                if  let errorText = resultData["errorText"] as? String {
-               // "Back response from server. Covid data not found for given area."
-                completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
-                print("functions.httpsCallable received errorText:: ", errorText)
-                return
-            }
-            guard let resultMessage = resultData["message"] as? String,
-//              print(resultMessage)
-              let resultStatusCode = resultData["statusCode"] as? String,
-              let resultColor = resultData["color"] as? String,
-              let cases = resultData["cases"] as? Float
-//              print(cases)
-            else {
-                completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
-                print( "functions.httpsCallable says: malformed or EMPTY result data from cloud functions")
-                return }
-            let color = ServerEntry.Color.hexStringToUIColor(hex: resultColor)
-            let entry = ServerEntry (color: color, timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: cases)
-
-             completion(.success(entry))
-           
+            self.parseResponse(result: result, completion: completion)
         }
+    }
+    
+    func parseResponse(result: HTTPSCallableResult?, completion: @escaping (Result<ServerEntry, Error>) -> Void){
+        
+         guard let resultData = (result?.data as? [String: Any]) else {
+              completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
+             print("functions.httpsCallable says: no result data from cloud functions")
+              return
+          }
+         
+         // parse response
+             if  let errorText = resultData["errorText"] as? String {
+            // "Back response from server. Covid data not found for given area."
+             completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
+             print("functions.httpsCallable received errorText:: ", errorText)
+             return
+         }
+         guard let resultMessage = resultData["message"] as? String,
+//              print(resultMessage)
+           let resultStatusCode = resultData["statusCode"] as? String,
+           let resultColor = resultData["color"] as? String,
+           let cases = resultData["cases"] as? Float
+//              print(cases)
+         else {
+             completion(.failure(NSError(domain: "", code: 0, userInfo: nil)))
+             print( "functions.httpsCallable says: malformed or EMPTY result data from cloud functions")
+             return }
+         
+         let lat = resultData["lat"] as? Double
+         let lon = resultData["lon"] as? Double
+         let locationName = resultData["locationName"] as? String
+         
+         let color = ServerEntry.Color.hexStringToUIColor(hex: resultColor)
+         let entry = ServerEntry (color: color, timestamp: Date(), statusCode: resultStatusCode, message: resultMessage, cases: cases, lat: lat, lon: lon, locationName: locationName)
+
+          completion(.success(entry))
     }
     
 }

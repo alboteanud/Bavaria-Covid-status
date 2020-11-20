@@ -14,16 +14,16 @@ struct Mocks {
 
 extension NSPersistentContainer {
     
-    // TODO  refractoring
+    // TODO  remake
     func insertFakeLocation(context: NSManagedObjectContext) -> String? {
         let entity = NSEntityDescription.entity(forEntityName: "LocationEntry",
                                            in: context)!
 //        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
         let fakeLocation = getFakeLocation()
-        let name = fakeLocation.name
-        print("will insert FakeLocation",fakeLocation.name)
+        let name = fakeLocation.locationName
+        print("will insert FakeLocation",fakeLocation.locationName)
         let object = NSManagedObject(entity: entity, insertInto: context)
-        object.setValue(fakeLocation.name, forKeyPath: "name")
+        object.setValue(fakeLocation.locationName, forKeyPath: "locationName")
         object.setValue(fakeLocation.id, forKeyPath: "id")
         object.setValue(fakeLocation.lat, forKeyPath: "lat")
         object.setValue(fakeLocation.lon, forKeyPath: "lon")

@@ -9,7 +9,7 @@ const baseUrl = 'https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/servi
 exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
 
   // Message text passed from the client.
-  const text = data.lat;
+  // const text = data.lat;
   // console.log(text);
 
   const response = await doRequest(data.lat, data.lon)
@@ -38,7 +38,13 @@ exports.calculateCovidStatus = functions.https.onCall(async (data, context) => {
         const cases = Math.fround(cases7_per_100k);
   const resultData = {
     // // returning result to the client.
-    message: documentFromDB.data().message, statusCode: covidStatus.code, color: covidStatus.color, cases: cases
+    message: documentFromDB.data().message, 
+    statusCode: covidStatus.code, 
+    color: covidStatus.color, 
+    cases: cases, 
+    lat: data.lat, 
+    lon: data.lon, 
+    locationName: "empty"
   }
 
   // console.log(resultData)

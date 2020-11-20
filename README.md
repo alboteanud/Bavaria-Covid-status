@@ -7,9 +7,9 @@
 
 ### Instructions to run
 
-Open a terminal at folder Bavaria covid state
-Run pod init and pod install
-Open the newly created xcworkspace file
+- Open a terminal at folder Bavaria covid state
+- Run pod init and pod install
+- Open the newly created xcworkspace file
 
 ### Note to the evaluator
 
@@ -30,58 +30,60 @@ The response sent back to the client includes: Covid status code, color, message
 
 ### Objectives for today Saturday 14th of November 2020
 
-iOS device sends its coord (lat, lon) and language to cloud function every 10 min or on press of a button
-Cloud function responds back with the Danger Level in the area and a message for the user. To do that, the cloud function will first interrogate the NpGeo DB with covid cases, parse json response, analyse the danger level, get the appropriate message from the Cloud Firestore database.
-The iOS device receives the response from the cloud function, stores response time, danger level and message for the user. Shows a notification if needed.
+- iOS device sends its coord (lat, lon) and language to cloud function every 10 min or on press of a button
+- Cloud function responds back with the Danger Level in the area and a message for the user. To do that, the cloud function will first interrogate the NpGeo DB with covid cases, parse json response, analyse the danger level, get the appropriate message from the Cloud Firestore database.
+- The iOS device receives the response from the cloud function, stores response time, danger level and message for the user. Shows a notification if needed.
 
 
 ### Objectives for today Monday 16th of  November
 
-Add real lat, lon coord to url in cloud function
-Get message alert to show in desired language - from Firestore
-Send all to the client - including color, message, danger level code..
-The client stores this in Core Data - in the background
-Notification if danger level has changed since last time
-Change app UI color and text message
-UI - show location name - if time allows - using coord and Google Maps API
+- Add real lat, lon coord to url in cloud function
+- Get message alert to show in desired language - from Firestore
+- Send all to the client - including color, message, danger level code..
+- The client stores this in Core Data - in the background
+- Notification if danger level has changed since last time
+- Change app UI color and text message
+- UI - show location name - if time allows - using coord and Google Maps API
 
 
 ### Objectives for today Tuesday 17th of November
 
-Think about UI. User screen, testing screen
-Build a UI sketch in Adobe XD
-Write a function - observe a managed object context. Handling notifications.
+- Think about UI. User screen, testing screen
+- Build a UI sketch in Adobe XD
+- Write a function - observe a managed object context. Handling notifications.
 
 
 ### Objectives for today Wednesday 18th of November
 
-Bug fixing
-Notification is not shown
-UI improvements
-Code rearrangements
-Testing. Write tests.
-Texts internationalisation
-Notifications on tribute code
+- Bug fixing
+- Notification is not shown
+- UI improvements
+- Code rearrangements
+- Testing. Write tests.
+- Texts internationalisation
+- Notifications on tribute code
 
 ### Objectives for today Friday 20th of November
 
 Even if the test time has ended, I still want to make some changes to the project:
-Improve the README file
-Add pods to commit so that to facillitate dodnloading and running the project
-Add lat, lon to the client response and store it in the ServerEntry
-Cloud Functions - add Google Maps - convert lat, lon into to location name
+- Improve the README file
+- Add pods to commit so that to facillitate dodnloading and running the project
+- Add lat, lon to the client response and store it in the ServerEntry
+- Cloud Functions - add Google Maps - convert lat, lon into to location name
 
 
 ### Tests performed
 
-The app self updates with location (lat, lon) even during the night. Stores location in Core Data. Check out the logs with stored coordinates (latitude printed): 
+- The app self updates with location (lat, lon) even during the night. Stores location in Core Data. Check out the logs with stored coordinates (latitude printed): 
+
 location 44.312587807603784 Optional(2020-11-18 09:22:07 +0000)
 location 44.312587807603784 Optional(2020-11-18 09:20:14 +0000)
 location 44.312587807603784 Optional(2020-11-18 09:16:28 +0000)
 location 44.312587807603784 Optional(2020-11-18 08:05:38 +0000)
 location 44.312587807603784 Optional(2020-11-18 06:15:58 +0000)
  
-The app’s  Background Task Scheduler fires every 10 minutes, triggering the Firebase Cloud Function. Check out some logs from the Firebase Functions:
+- The app’s  Background Task Scheduler fires every 10 minutes, triggering the Firebase Cloud Function. Check out some logs from the Firebase Functions:
+
 8:38:32.490 PM    calculateCovidStatus
 Function execution took 416 ms, finished with status code: 200
 8:48:36.182 PM    calculateCovidStatus
@@ -92,10 +94,9 @@ Function execution took 233 ms, finished with status code: 200
 9:22:17.152 PM    calculateCovidStatus
 
 
-The change in the device preferred language is reflected in the user interface. Instruction messages for Covid protection are shown in german, english and romanian.
-All color code are shown - choose fake location and update
-
-Inserting fake locations is yet to be debugged.
+- The change in the device preferred language is reflected in the user interface. Instruction messages for Covid protection are shown in german, english and romanian.
+- All color code are shown - choose fake location and update
+- Inserting fake locations works 
 
 
 ### Requirements for this app

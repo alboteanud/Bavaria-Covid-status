@@ -29,8 +29,11 @@ struct ServerEntry: Codable {
     let color: Color
     let timestamp: Date?
     let statusCode: String?
-    let message: String?
+    let message: String
     let cases: Float
+    let lat: Double?
+    let lon: Double?
+    let locationName: String?
 }
 
 

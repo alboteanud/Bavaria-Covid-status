@@ -76,7 +76,7 @@ struct Operations {
         }
     }
 
-// An extension to create a FeedEntry object from the cloud representation of an entry.
+// An extension to create a FeedEntry object from the Firebase Cloud Function representation of an entry.
 extension FeedEntry {
     convenience init(context: NSManagedObjectContext, areaInfo: ServerEntry) {
         self.init(context: context)
@@ -85,6 +85,9 @@ extension FeedEntry {
         self.timestamp = areaInfo.timestamp
         self.cases = areaInfo.cases
         self.color = Color(areaInfo.color)
+        self.locationName = areaInfo.locationName
+        self.lat = areaInfo.lat ?? 0
+        self.lon = areaInfo.lon ?? 0
     }
 }
 

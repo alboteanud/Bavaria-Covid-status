@@ -21,36 +21,12 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
     @IBOutlet weak var casesTextView: UITextView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var locationTextView: UITextView!
- 
-    @IBAction func onChangeLocationButtonClick(_ sender: Any) {
-        if let fakeLocationName = PersistentContainer.shared.insertFakeLocation(context: PersistentContainer.shared.viewContext){
-            locationTextView.text = fakeLocationName
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         initFetchedResultsController()
         fetchFeedEntry()
-    }
-    
-   func viewDidLoad2() {
-        super.viewDidLoad()
-        if fetchRequest == nil {
-            fetchRequest = FeedEntry.fetchRequest()
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FeedEntry.timestamp), ascending: false)]
-        }
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-                                                              managedObjectContext: PersistentContainer.shared.viewContext,
-                                                              sectionNameKeyPath: nil,
-                                                              cacheName: String(describing: self))
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Error fetching results: \(error)")
-        }
     }
     
     func initFetchedResultsController()  {
@@ -83,6 +59,14 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
                 print("Error fetching from context: \(error)")
             }
         }
+       }
+    
+    
+    @IBAction func onChangeLocationButtonClick(_ sender: Any) {
+           if let fakeLocationName = PersistentContainer.shared.insertFakeLocation(context: PersistentContainer.shared.viewContext){
+               locationTextView.text = fakeLocationName
+               updateEntries()
+           }
        }
     
     @IBAction func onUpdateButtonClick(_ sender: Any) {
@@ -133,6 +117,9 @@ class ViewController: UIViewController , NSFetchedResultsControllerDelegate{
         let statusColor = entry.color!
         let myUIColor = UIColor(statusColor)
         self.colorView.backgroundColor = myUIColor
+        
+        let textLocation = String("lat: \(entry.lat)   lon: \(entry.lon)")
+        locationTextView.text = textLocation
     }
     
     private func showLoadingUI(){
