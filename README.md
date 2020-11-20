@@ -96,7 +96,8 @@ Function execution took 233 ms, finished with status code: 200
 
 - The change in the device preferred language is reflected in the user interface. Instruction messages for Covid protection are shown in german, english and romanian.
 - All color code are shown - choose fake location and update
-- Inserting fake locations works 
+- Inserting fake locations works. 
+- Bug to solve. After changing location - the location name, sometimes, does not correspond to the lat, lon coord shown.
 
 
 ### Requirements for this app
