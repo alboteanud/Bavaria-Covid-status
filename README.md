@@ -11,10 +11,6 @@
 - Run pod init and pod install
 - Open the newly created xcworkspace file
 
-### Note to the evaluator
-
-Make comments for me inside the code and do NOT be kind. Any information is wellcomed. 
-
 
 ### How the app works
 
